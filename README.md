@@ -12,7 +12,7 @@ A simple Book Library application that includes UI for users to view books, an A
 ## Installation
 
 ### Prerequisites
-- Node.js (for UI)
+- React.js (for UI)
 - .NET Core (for Web API)
 - SQL Server (for database)
 
