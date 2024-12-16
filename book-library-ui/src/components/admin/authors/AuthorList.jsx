@@ -10,6 +10,10 @@ const AuthorList = () => {
     const [open, setOpen] = useState(false);
     const [selectedAuthor, setSelectedAuthor] = useState(null);
 
+    // New state for managing delete confirmation dialog
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); 
+    const [authorToDelete, setAuthorToDelete] = useState(null); 
+
     // Fetch authors on initial load
     useEffect(() => {
         if (status === 'idle') {
@@ -17,8 +21,24 @@ const AuthorList = () => {
         }
     }, [status, dispatch]);
 
-    const handleDelete = (id) => {
-        dispatch(deleteAuthor(id));
+    // Open the delete confirmation dialog
+    const handleDelete = (author) => {
+        setAuthorToDelete(author);
+        setDeleteDialogOpen(true); 
+    };
+
+    // Confirm deletion and dispatch the delete action
+    const confirmDelete = () => {
+        if (authorToDelete) {
+            dispatch(deleteAuthor(authorToDelete.authorId));
+        }
+        setDeleteDialogOpen(false); 
+    };
+
+    // Cancel deletion and close the dialog
+    const cancelDelete = () => {
+        setDeleteDialogOpen(false); 
+        setAuthorToDelete(null); 
     };
 
     const handleEdit = (author) => {
@@ -80,7 +100,7 @@ const AuthorList = () => {
                                         variant="contained"
                                         color="error"
                                         size="small"
-                                        onClick={() => handleDelete(author.authorId)}
+                                        onClick={() => handleDelete(author)}
                                     >
                                         Delete
                                     </Button>
@@ -91,10 +111,36 @@ const AuthorList = () => {
                 </table>
             )}
 
+            {/* Material-UI Modal for editing or adding an author */}
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>{selectedAuthor ? 'Edit Author' : 'Add Author'}</DialogTitle>
                 <DialogContent>
                     <AuthorForm selectedAuthor={selectedAuthor} onClose={handleClose} />
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <p>Are you sure you want to delete this author?</p>
+                    <div className="d-flex justify-content-end">
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={cancelDelete}
+                            style={{ marginRight: '8px' }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={confirmDelete}
+                        >
+                            Delete
+                        </Button>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>

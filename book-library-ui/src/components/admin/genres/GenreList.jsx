@@ -10,6 +10,10 @@ const GenreList = () => {
     const [open, setOpen] = useState(false);
     const [selectedGenre, setSelectedGenre] = useState(null);
 
+    // New state for managing delete confirmation dialog
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); 
+    const [genreToDelete, setGenreToDelete] = useState(null); 
+
     // Fetch genres on initial load
     useEffect(() => {
         if (status === 'idle') {
@@ -17,8 +21,24 @@ const GenreList = () => {
         }
     }, [status, dispatch]);
 
-    const handleDelete = (id) => {
-        dispatch(deleteGenre(id));
+    // Open the delete confirmation dialog
+    const handleDelete = (genre) => {
+        setGenreToDelete(genre); 
+        setDeleteDialogOpen(true); 
+    };
+
+    // Confirm deletion and dispatch the delete action
+    const confirmDelete = () => {
+        if (genreToDelete) {
+            dispatch(deleteGenre(genreToDelete.genreId)); 
+        }
+        setDeleteDialogOpen(false); 
+    };
+
+    // Cancel deletion and close the dialog
+    const cancelDelete = () => {
+        setDeleteDialogOpen(false); 
+        setGenreToDelete(null); 
     };
 
     const handleEdit = (genre) => {
@@ -78,7 +98,7 @@ const GenreList = () => {
                                         variant="contained"
                                         color="error"
                                         size="small"
-                                        onClick={() => handleDelete(genre.genreId)}
+                                        onClick={() => handleDelete(genre)}
                                     >
                                         Delete
                                     </Button>
@@ -89,10 +109,36 @@ const GenreList = () => {
                 </table>
             )}
 
+            {/* Material-UI Modal for editing or adding a genre */}
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>{selectedGenre ? 'Edit Genre' : 'Add Genre'}</DialogTitle>
                 <DialogContent>
                     <GenreForm selectedGenre={selectedGenre} onClose={handleClose} />
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <p>Are you sure you want to delete this genre?</p>
+                    <div className="d-flex justify-content-end">
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={cancelDelete}
+                            style={{ marginRight: '8px' }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={confirmDelete}
+                        >
+                            Delete
+                        </Button>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>
