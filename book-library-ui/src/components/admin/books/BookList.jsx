@@ -9,8 +9,6 @@ const BookList = () => {
     const { booksList: books, status, error } = useSelector((state) => state.books);
     const [open, setOpen] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); 
-    const [bookToDelete, setBookToDelete] = useState(null); 
 
     // Fetch books on initial load
     useEffect(() => {
@@ -20,21 +18,8 @@ const BookList = () => {
         console.log("books : ", books);
     }, [status, dispatch]);
 
-    const handleDelete = (book) => {
-        setBookToDelete(book); 
-        setDeleteDialogOpen(true); 
-    };
-
-    const confirmDelete = () => {
-        if (bookToDelete) {
-            dispatch(deleteBook(bookToDelete.bookId)); 
-        }
-        setDeleteDialogOpen(false);
-    };
-
-    const cancelDelete = () => {
-        setDeleteDialogOpen(false);
-        setBookToDelete(null); 
+    const handleDelete = (id) => {
+        dispatch(deleteBook(id));
     };
 
     const handleEdit = (book) => {
@@ -101,7 +86,7 @@ const BookList = () => {
                                         variant="contained"
                                         color="error"
                                         size="small"
-                                        onClick={() => handleDelete(book)}
+                                        onClick={() => handleDelete(book.bookId)}
                                     >
                                         Delete
                                     </Button>
@@ -117,31 +102,6 @@ const BookList = () => {
                 <DialogTitle>{selectedBook ? 'Edit Book' : 'Add Book'}</DialogTitle>
                 <DialogContent>
                     <BookForm selectedBook={selectedBook} onClose={handleClose} />
-                </DialogContent>
-            </Dialog>
-
-            {/* Delete Confirmation Dialog */}
-            <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    <p>Are you sure you want to delete this book?</p>
-                    <div className="d-flex justify-content-end">
-                        <Button
-                            variant="outlined"
-                            color="primary"
-                            onClick={cancelDelete}
-                            style={{ marginRight: '8px' }}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="error"
-                            onClick={confirmDelete}
-                        >
-                            Delete
-                        </Button>
-                    </div>
                 </DialogContent>
             </Dialog>
         </div>
